@@ -1,4 +1,3 @@
-```markdown
 # NPM Wake-on-LAN Configurator
 
 **NPM Wake-on-LAN Configurator** is a web-based application designed to integrate Wake-on-LAN (WOL) functionality with Nginx Proxy Manager (NPM) on Unraid servers. This tool allows users to manage devices, send Magic Packets to wake them up remotely, and seamlessly integrate with their existing NPM setup.
