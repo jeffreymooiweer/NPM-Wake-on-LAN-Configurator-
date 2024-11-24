@@ -1,0 +1,15 @@
+# Stage 1: Frontend build
+frontend/node_modules
+frontend/build
+
+# Stage 2: Backend
+backend/__pycache__
+backend/*.pyc
+backend/devices.db
+
+# Algemene
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+README.md
