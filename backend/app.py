@@ -40,8 +40,12 @@ class Device(db.Model):
 @app.route('/api/devices', methods=['GET', 'POST'])
 def manage_devices():
     if request.method == 'GET':
-        devices = Device.query.all()
-        return jsonify([device.to_dict() for device in devices]), 200
+        try:
+            devices = Device.query.all()
+            return jsonify([device.to_dict() for device in devices]), 200
+        except Exception as e:
+            logging.error(f'Error fetching devices: {str(e)}')
+            return jsonify({'error': 'Fout bij ophalen apparaten.'}), 500
     elif request.method == 'POST':
         data = request.get_json()
         if not data.get('domain') or not data.get('ip') or not data.get('mac'):
@@ -54,7 +58,7 @@ def manage_devices():
             return jsonify(new_device.to_dict()), 201
         except Exception as e:
             db.session.rollback()
-            logging.error(f'Fout bij toevoegen apparaat: {str(e)}')
+            logging.error(f'Error adding device: {str(e)}')
             return jsonify({'error': 'Fout bij toevoegen apparaat.'}), 500
 
 @app.route('/api/devices/<int:device_id>', methods=['PUT', 'DELETE'])
@@ -71,7 +75,7 @@ def modify_device(device_id):
             return jsonify(device.to_dict()), 200
         except Exception as e:
             db.session.rollback()
-            logging.error(f'Fout bij bijwerken apparaat: {str(e)}')
+            logging.error(f'Error updating device: {str(e)}')
             return jsonify({'error': 'Fout bij bijwerken apparaat.'}), 500
     elif request.method == 'DELETE':
         try:
@@ -81,8 +85,19 @@ def modify_device(device_id):
             return jsonify({'message': 'Apparaat verwijderd.'}), 200
         except Exception as e:
             db.session.rollback()
-            logging.error(f'Fout bij verwijderen apparaat: {str(e)}')
+            logging.error(f'Error deleting device: {str(e)}')
             return jsonify({'error': 'Fout bij verwijderen apparaat.'}), 500
+
+@app.route('/api/devices/<int:device_id>/wake', methods=['POST'])
+def wake_device(device_id):
+    device = Device.query.get_or_404(device_id)
+    try:
+        send_magic_packet(device.mac, ip_address=device.ip)
+        logging.info(f'Magic Packet verzonden naar {device.domain} ({device.ip})')
+        return jsonify({'message': f'Magic Packet verzonden naar {device.domain}'}), 200
+    except Exception as e:
+        logging.error(f'Error sending Magic Packet to {device.domain}: {str(e)}')
+        return jsonify({'error': 'Fout bij verzenden Magic Packet.'}), 500
 
 # Serve React App
 @app.route('/', defaults={'path': ''})
@@ -108,6 +123,9 @@ def bad_request(error):
 def internal_error(error):
     return jsonify({'error': 'Interne serverfout.'}), 500
 
-if __name__ == '__main__':
+# Initialize the database within app context
+with app.app_context():
     db.create_all()
+
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
