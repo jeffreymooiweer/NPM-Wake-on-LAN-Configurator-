@@ -1,10 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from wakeonlan import send_magic_packet
 import logging
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='frontend/build')
 CORS(app)
 
 # Configuratie van de database
@@ -83,16 +84,16 @@ def modify_device(device_id):
             logging.error(f'Fout bij verwijderen apparaat: {str(e)}')
             return jsonify({'error': 'Fout bij verwijderen apparaat.'}), 500
 
-@app.route('/api/devices/<int:device_id>/wake', methods=['POST'])
-def wake_device(device_id):
-    device = Device.query.get_or_404(device_id)
-    try:
-        send_magic_packet(device.mac, ip_address=device.ip)
-        logging.info(f'Magic Packet verzonden naar {device.domain} ({device.ip})')
-        return jsonify({'message': f'Magic Packet verzonden naar {device.domain}'}), 200
-    except Exception as e:
-        logging.error(f'Fout bij verzenden Magic Packet naar {device.domain}: {str(e)}')
-        return jsonify({'error': 'Fout bij verzenden Magic Packet.'}), 500
+# Serve React App
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path.startswith('api/'):
+        return jsonify({'error': 'Resource niet gevonden.'}), 404
+    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
 
 # Globale foutafhandeling
 @app.errorhandler(404)
