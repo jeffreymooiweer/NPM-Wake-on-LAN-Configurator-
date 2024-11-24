@@ -3,8 +3,8 @@ FROM node:16 as frontend-build
 
 WORKDIR /app/frontend
 
-# Kopieer package.json en package-lock.json
-COPY frontend/package.json frontend/package-lock.json ./
+# Kopieer package.json
+COPY frontend/package.json ./
 
 # Installeer frontend dependencies
 RUN npm install
