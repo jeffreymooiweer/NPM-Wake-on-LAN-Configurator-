@@ -4,6 +4,7 @@ from flask_cors import CORS
 from wakeonlan import send_magic_packet
 import logging
 import os
+import re
 
 app = Flask(__name__, static_folder='frontend/build')
 CORS(app)
@@ -35,6 +36,24 @@ class Device(db.Model):
             'mac': self.mac
         }
 
+# Functie om IP-adres te valideren
+def is_valid_ip(ip):
+    pattern = re.compile(r"""
+        ^
+        (?:
+          # Dotted variants:
+          (?:
+            # Decimal 1-255 (no leading zeros)
+            (?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)
+          \.){3}
+          (?:
+            25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d
+          )
+        )
+        $
+    """, re.VERBOSE)
+    return pattern.match(ip) is not None
+
 # Routes
 
 @app.route('/api/devices', methods=['GET', 'POST'])
@@ -48,9 +67,23 @@ def manage_devices():
             return jsonify({'error': 'Fout bij ophalen apparaten.'}), 500
     elif request.method == 'POST':
         data = request.get_json()
-        if not data.get('domain') or not data.get('ip') or not data.get('mac'):
+        domain = data.get('domain')
+        ip = data.get('ip')
+        mac = data.get('mac')
+
+        # Validatie van input
+        if not domain or not ip or not mac:
             return jsonify({'error': 'Alle velden zijn vereist.'}), 400
-        new_device = Device(domain=data['domain'], ip=data['ip'], mac=data['mac'])
+
+        if not is_valid_ip(ip):
+            return jsonify({'error': 'Ongeldig IP-adres.'}), 400
+
+        # Optioneel: Validatie van MAC-adres
+        mac_pattern = re.compile(r'^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$')
+        if not mac_pattern.match(mac):
+            return jsonify({'error': 'Ongeldig MAC-adres.'}), 400
+
+        new_device = Device(domain=domain, ip=ip, mac=mac)
         try:
             db.session.add(new_device)
             db.session.commit()
@@ -66,9 +99,25 @@ def modify_device(device_id):
     device = Device.query.get_or_404(device_id)
     if request.method == 'PUT':
         data = request.get_json()
-        device.domain = data.get('domain', device.domain)
-        device.ip = data.get('ip', device.ip)
-        device.mac = data.get('mac', device.mac)
+        domain = data.get('domain', device.domain)
+        ip = data.get('ip', device.ip)
+        mac = data.get('mac', device.mac)
+
+        # Validatie van input
+        if not domain or not ip or not mac:
+            return jsonify({'error': 'Alle velden zijn vereist.'}), 400
+
+        if not is_valid_ip(ip):
+            return jsonify({'error': 'Ongeldig IP-adres.'}), 400
+
+        # Optioneel: Validatie van MAC-adres
+        mac_pattern = re.compile(r'^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$')
+        if not mac_pattern.match(mac):
+            return jsonify({'error': 'Ongeldig MAC-adres.'}), 400
+
+        device.domain = domain
+        device.ip = ip
+        device.mac = mac
         try:
             db.session.commit()
             logging.info(f'Apparaat bijgewerkt: {device.domain}')
