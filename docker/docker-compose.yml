@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: jouwdockerhubgebruikersnaam/npm-wake-on-lan-configurator:latest
+    container_name: wol-configurator
+    ports:
+      - "8462:5001"
+    volumes:
+      - wol_data:/app/backend/devices.db
+      - ./backend/app.log:/app/backend/app.log
+    restart: unless-stopped
+
+volumes:
+  wol_data:
