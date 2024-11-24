@@ -5,7 +5,7 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
-    image: jouwdockerhubgebruikersnaam/npm-wake-on-lan-configurator:latest
+    image: jeffersonmouze/npm-wake-on-lan-configurator:latest
     container_name: wol-configurator
     ports:
       - "8462:5001"
