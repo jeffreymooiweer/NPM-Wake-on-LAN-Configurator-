@@ -2,23 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Container, Typography, Snackbar, Alert } from '@mui/material';
 import AddDeviceForm from './AddDeviceForm';
 import DeviceTable from './DeviceTable';
-import EditDeviceModal from './EditDeviceModal';
+import DeviceActions from './DeviceActions';
 
-function App() {
+const App = () => {
   const [devices, setDevices] = useState([]);
-  const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [currentDevice, setCurrentDevice] = useState(null);
-
-  // Fetch devices
-  const fetchDevices = () => {
-    fetch('/api/devices')
-      .then(res => res.json())
-      .then(data => setDevices(data))
-      .catch(err => {
-        setNotification({ open: true, message: 'Fout bij het ophalen van apparaten.', severity: 'error' });
-      });
-  };
+  const [selectedDeviceId, setSelectedDeviceId] = useState(null);
+  const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' });
 
   useEffect(() => {
     fetchDevices();
@@ -26,101 +15,111 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Voeg apparaat toe
-  const addDevice = (device) => {
+  const fetchDevices = () => {
+    fetch('/api/devices')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setDevices(data);
+        } else {
+          setNotification({ open: true, message: data.error || 'Fout bij het ophalen van apparaten.', severity: 'error' });
+        }
+      })
+      .catch(err => {
+        setNotification({ open: true, message: 'Fout bij het ophalen van apparaten.', severity: 'error' });
+      });
+  };
+
+  const handleAddDevice = (device) => {
     fetch('/api/devices', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(device),
     })
-      .then(res => {
-        if (!res.ok) {
-          return res.json().then(err => { throw err; });
-        }
-        return res.json();
-      })
+      .then(res => res.json())
       .then(data => {
-        setDevices([...devices, data]);
-        setNotification({ open: true, message: 'Apparaat toegevoegd!', severity: 'success' });
+        if (data.error) {
+          setNotification({ open: true, message: data.error, severity: 'error' });
+        } else {
+          setDevices([...devices, data]);
+          setNotification({ open: true, message: 'Apparaat toegevoegd!', severity: 'success' });
+        }
       })
       .catch(err => {
-        setNotification({ open: true, message: err.error || 'Fout bij het toevoegen van apparaat.', severity: 'error' });
+        setNotification({ open: true, message: 'Fout bij het toevoegen van apparaat.', severity: 'error' });
       });
   };
 
-  // Bewerken apparaat
-  const editDevice = (updatedDevice) => {
-    fetch(`/api/devices/${updatedDevice.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedDevice),
-    })
-      .then(res => {
-        if (!res.ok) {
-          return res.json().then(err => { throw err; });
-        }
-        return res.json();
-      })
-      .then(data => {
-        setDevices(devices.map(device => device.id === data.id ? data : device));
-        setNotification({ open: true, message: 'Apparaat bijgewerkt!', severity: 'success' });
-      })
-      .catch(err => {
-        setNotification({ open: true, message: err.error || 'Fout bij het bijwerken van apparaat.', severity: 'error' });
-      });
-  };
-
-  // Open bewerkmodal
   const handleEdit = (device) => {
-    setCurrentDevice(device);
-    setEditModalOpen(true);
+    // Implementatie van bewerken, bijvoorbeeld openen van een modal
+    setNotification({ open: true, message: `Edit apparaat: ${device.domain}`, severity: 'info' });
   };
+
+  const handleDelete = (id) => {
+    if (!window.confirm('Weet je zeker dat je dit apparaat wilt verwijderen?')) return;
+    fetch(`/api/devices/${id}`, {
+      method: 'DELETE',
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          setNotification({ open: true, message: data.error, severity: 'error' });
+        } else {
+          setDevices(devices.filter(device => device.id !== id));
+          setNotification({ open: true, message: 'Apparaat verwijderd!', severity: 'success' });
+          if (selectedDeviceId === id) setSelectedDeviceId(null);
+        }
+      })
+      .catch(err => {
+        setNotification({ open: true, message: 'Fout bij het verwijderen van apparaat.', severity: 'error' });
+      });
+  };
+
+  const handleTestWOL = (device) => {
+    fetch(`/api/devices/${device.id}/wake`, { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          setNotification({ open: true, message: data.error, severity: 'error' });
+        } else {
+          setNotification({ open: true, message: data.message, severity: 'success' });
+        }
+      })
+      .catch(err => {
+        setNotification({ open: true, message: 'Fout bij testen WOL.', severity: 'error' });
+      });
+  };
+
+  const selectedDevice = devices.find(device => device.id === selectedDeviceId);
 
   return (
-    <Container sx={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
-      <Typography variant="h4" gutterBottom align="center">
+    <Container>
+      <Typography variant="h4" gutterBottom>
         NPM Wake-on-LAN Configurator
       </Typography>
-      
-      {/* Formulier om apparaat toe te voegen */}
-      <AddDeviceForm addDevice={addDevice} setNotification={setNotification} />
-
-      {/* Tabel met apparaten */}
+      <AddDeviceForm onAddDevice={handleAddDevice} setNotification={setNotification} />
       <DeviceTable 
         devices={devices} 
-        handleEdit={handleEdit} 
-        setDevices={setDevices} 
-        setNotification={setNotification} 
+        selectedDeviceId={selectedDeviceId}
+        setSelectedDeviceId={setSelectedDeviceId}
       />
-
-      {/* Bewerken apparaat modal */}
-      {currentDevice && (
-        <EditDeviceModal
-          open={editModalOpen}
-          handleClose={() => setEditModalOpen(false)}
-          device={currentDevice}
-          handleSave={editDevice}
-        />
-      )}
-
-      {/* Snackbar notificatie */}
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={6000}
+      <DeviceActions 
+        selectedDevice={selectedDevice} 
+        handleEdit={handleEdit} 
+        handleDelete={handleDelete} 
+        handleTestWOL={handleTestWOL} 
+      />
+      <Snackbar 
+        open={notification.open} 
+        autoHideDuration={6000} 
         onClose={() => setNotification({ ...notification, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert 
-          onClose={() => setNotification({ ...notification, open: false })} 
-          severity={notification.severity} 
-          sx={{ width: '100%' }}
-          variant="filled"
-        >
+        <Alert onClose={() => setNotification({ ...notification, open: false })} severity={notification.severity} sx={{ width: '100%' }}>
           {notification.message}
         </Alert>
       </Snackbar>
     </Container>
   );
-}
+};
 
 export default App;
