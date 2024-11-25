@@ -1,65 +1,63 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box, Paper } from '@mui/material';
+import { TextField, Button, Box } from '@mui/material';
 
-const AddDeviceForm = ({ addDevice, setNotification }) => {
-  const [formData, setFormData] = useState({ domain: '', ip: '', mac: '' });
+const AddDeviceForm = ({ onAddDevice, setNotification }) => {
+  const [domain, setDomain] = useState('');
+  const [ip, setIp] = useState('');
+  const [mac, setMac] = useState('');
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = () => {
-    if (!formData.domain || !formData.ip || !formData.mac) {
-      setNotification({ open: true, message: 'Vul alle velden in.', severity: 'warning' });
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!domain || !ip || !mac) {
+      setNotification({ open: true, message: 'Alle velden zijn vereist.', severity: 'error' });
       return;
     }
-    // Eenvoudige validatie van IP en MAC
-    const ipRegex = /^(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(\1)\.(\1)\.(\1)$/;
-    const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
-    if (!ipRegex.test(formData.ip)) {
-      setNotification({ open: true, message: 'Ongeldig IP-adres.', severity: 'warning' });
-      return;
-    }
-    if (!macRegex.test(formData.mac)) {
-      setNotification({ open: true, message: 'Ongeldig MAC-adres.', severity: 'warning' });
-      return;
-    }
-    addDevice(formData);
-    setFormData({ domain: '', ip: '', mac: '' });
+    onAddDevice({ domain, ip, mac });
+    setDomain('');
+    setIp('');
+    setMac('');
   };
 
   return (
-    <Paper elevation={3} sx={{ padding: '1rem', marginBottom: '2rem' }}>
-      <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2}>
-        <TextField
-          label="Domeinnaam"
-          name="domain"
-          value={formData.domain}
-          onChange={handleChange}
-          variant="outlined"
-          fullWidth
-        />
-        <TextField
-          label="Intern IP-adres"
-          name="ip"
-          value={formData.ip}
-          onChange={handleChange}
-          variant="outlined"
-          fullWidth
-        />
-        <TextField
-          label="MAC-adres"
-          name="mac"
-          value={formData.mac}
-          onChange={handleChange}
-          variant="outlined"
-          fullWidth
-        />
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
-          Add Device
-        </Button>
-      </Box>
-    </Paper>
+    <Box 
+      component="form" 
+      onSubmit={handleSubmit} 
+      sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, marginBottom: 2 }}
+    >
+      <TextField
+        label="Domeinnaam"
+        variant="outlined"
+        value={domain}
+        onChange={(e) => setDomain(e.target.value)}
+        fullWidth
+        sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+      />
+      <TextField
+        label="Intern IP"
+        variant="outlined"
+        value={ip}
+        onChange={(e) => setIp(e.target.value)}
+        fullWidth
+        sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+      />
+      <TextField
+        label="MAC-adres"
+        variant="outlined"
+        value={mac}
+        onChange={(e) => setMac(e.target.value)}
+        fullWidth
+        sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+      />
+      <Button 
+        type="submit" 
+        variant="contained" 
+        color="primary"
+        fullWidth={{ xs: true, sm: false }}
+        sx={{ fontSize: { xs: '0.8rem', sm: '1rem' }, height: '56px' }}
+      >
+        Add Device
+      </Button>
+    </Box>
   );
 };
 
