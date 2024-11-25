@@ -1,15 +1,17 @@
+// App.js
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, Snackbar, Alert } from '@mui/material';
 import AddDeviceForm from './AddDeviceForm';
 import DeviceTable from './DeviceTable';
 import DeviceActions from './DeviceActions';
-import EditDeviceModal from './EditDeviceModal'; // Pas het pad aan indien nodig
-
+import EditDeviceModal from './EditDeviceModal'; // Zorg ervoor dat dit correct is
 
 const App = () => {
   const [devices, setDevices] = useState([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState(null);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' });
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [deviceToEdit, setDeviceToEdit] = useState(null);
 
   useEffect(() => {
     fetchDevices();
@@ -53,8 +55,35 @@ const App = () => {
   };
 
   const handleEdit = (device) => {
-    // Implementatie van bewerken, bijvoorbeeld openen van een modal
-    setNotification({ open: true, message: `Edit apparaat: ${device.domain}`, severity: 'info' });
+    setDeviceToEdit(device);
+    setIsEditModalOpen(true);
+    setNotification({ open: true, message: `Edit apparaat: ${device.domain}`, severity: 'info' }); // Eventueel verwijderen
+  };
+
+  const handleUpdateDevice = (updatedDevice) => {
+    fetch(`/api/devices/${updatedDevice.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        domain: updatedDevice.domain,
+        ip: updatedDevice.ip,
+        mac: updatedDevice.mac,
+      }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          setNotification({ open: true, message: data.error, severity: 'error' });
+        } else {
+          setDevices(devices.map(device => device.id === data.id ? data : device));
+          setNotification({ open: true, message: 'Apparaat bijgewerkt!', severity: 'success' });
+          setIsEditModalOpen(false);
+          setDeviceToEdit(null);
+        }
+      })
+      .catch(err => {
+        setNotification({ open: true, message: 'Fout bij het bijwerken van apparaat.', severity: 'error' });
+      });
   };
 
   const handleDelete = (id) => {
@@ -96,7 +125,7 @@ const App = () => {
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
         NPM Wake-on-LAN Configurator
       </Typography>
       <AddDeviceForm onAddDevice={handleAddDevice} setNotification={setNotification} />
@@ -110,6 +139,12 @@ const App = () => {
         handleEdit={handleEdit} 
         handleDelete={handleDelete} 
         handleTestWOL={handleTestWOL} 
+      />
+      <EditDeviceModal 
+        open={isEditModalOpen} 
+        handleClose={() => { setIsEditModalOpen(false); setDeviceToEdit(null); }} 
+        device={deviceToEdit} 
+        onUpdate={handleUpdateDevice} 
       />
       <Snackbar 
         open={notification.open} 
