@@ -1,82 +1,91 @@
+// EditDeviceModal.js
 import React, { useState, useEffect } from 'react';
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  TextField, 
-  Button 
-} from '@mui/material';
+import { Modal, Box, TextField, Button, Typography } from '@mui/material';
 
-const EditDeviceModal = ({ open, handleClose, device, handleSave }) => {
-  const [formData, setFormData] = useState({ ...device });
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: { xs: '90%', sm: 400 },
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
+const EditDeviceModal = ({ open, handleClose, device, onUpdate }) => {
+  const [domain, setDomain] = useState('');
+  const [ip, setIp] = useState('');
+  const [mac, setMac] = useState('');
 
   useEffect(() => {
-    setFormData({ ...device });
+    if (device) {
+      setDomain(device.domain);
+      setIp(device.ip);
+      setMac(device.mac);
+    }
   }, [device]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const onSave = () => {
-    if (!formData.domain || !formData.ip || !formData.mac) {
-      // Je kunt hier een notificatie triggeren als je wilt
-      return;
-    }
-    // Eenvoudige validatie van IP en MAC
-    const ipRegex = /^(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)$/;
-    const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
-    if (!ipRegex.test(formData.ip)) {
-      // Trigger een notificatie voor ongeldig IP
-      return;
-    }
-    if (!macRegex.test(formData.mac)) {
-      // Trigger een notificatie voor ongeldig MAC
-      return;
-    }
-    handleSave(formData);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!domain || !ip || !mac) return;
+    onUpdate({ ...device, domain, ip, mac });
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Apparaat Bewerken</DialogTitle>
-      <DialogContent>
+    <Modal
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="edit-device-title"
+      aria-describedby="edit-device-description"
+    >
+      <Box component="form" onSubmit={handleSubmit} sx={style}>
+        <Typography id="edit-device-title" variant="h6" component="h2" gutterBottom>
+          Edit Apparaat
+        </Typography>
         <TextField
           label="Domeinnaam"
-          name="domain"
-          value={formData.domain}
-          onChange={handleChange}
           variant="outlined"
+          value={domain}
+          onChange={(e) => setDomain(e.target.value)}
           fullWidth
-          margin="dense"
+          margin="normal"
+          sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
         />
         <TextField
-          label="Intern IP-adres"
-          name="ip"
-          value={formData.ip}
-          onChange={handleChange}
+          label="Intern IP"
           variant="outlined"
+          value={ip}
+          onChange={(e) => setIp(e.target.value)}
           fullWidth
-          margin="dense"
+          margin="normal"
+          sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
         />
         <TextField
           label="MAC-adres"
-          name="mac"
-          value={formData.mac}
-          onChange={handleChange}
           variant="outlined"
+          value={mac}
+          onChange={(e) => setMac(e.target.value)}
           fullWidth
-          margin="dense"
+          margin="normal"
+          sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
         />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>Annuleren</Button>
-        <Button onClick={onSave} color="primary" variant="contained">
-          Opslaan
-        </Button>
-      </DialogActions>
-    </Dialog>
+        <Box display="flex" justifyContent="flex-end" gap={2} marginTop={2}>
+          <Button variant="contained" color="primary" type="submit" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>
+            Save
+          </Button>
+          <Button 
+            variant="outlined" 
+            color="secondary" 
+            onClick={handleClose}
+            sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
+          >
+            Cancel
+          </Button>
+        </Box>
+      </Box>
+    </Modal>
   );
 };
 
