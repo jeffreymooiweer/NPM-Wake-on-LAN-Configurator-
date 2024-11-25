@@ -1,10 +1,10 @@
 // App.js
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Snackbar, Alert } from '@mui/material';
+import { Container, Typography, Snackbar, Alert, Button } from '@mui/material';
 import AddDeviceForm from './AddDeviceForm';
 import DeviceTable from './DeviceTable';
 import DeviceActions from './DeviceActions';
-import EditDeviceModal from './EditDeviceModal'; // Zorg ervoor dat dit correct is
+import EditDeviceModal from './EditDeviceModal'; // Zorg voor correcte import
 
 const App = () => {
   const [devices, setDevices] = useState([]);
@@ -55,9 +55,9 @@ const App = () => {
   };
 
   const handleEdit = (device) => {
+    console.log('handleEdit called with device:', device); // Debugging lijn
     setDeviceToEdit(device);
     setIsEditModalOpen(true);
-    setNotification({ open: true, message: `Edit apparaat: ${device.domain}`, severity: 'info' }); // Eventueel verwijderen
   };
 
   const handleUpdateDevice = (updatedDevice) => {
