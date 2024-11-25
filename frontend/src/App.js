@@ -3,6 +3,8 @@ import { Container, Typography, Snackbar, Alert } from '@mui/material';
 import AddDeviceForm from './AddDeviceForm';
 import DeviceTable from './DeviceTable';
 import DeviceActions from './DeviceActions';
+import EditDeviceModal from './EditDeviceModal'; // Pas het pad aan indien nodig
+
 
 const App = () => {
   const [devices, setDevices] = useState([]);
