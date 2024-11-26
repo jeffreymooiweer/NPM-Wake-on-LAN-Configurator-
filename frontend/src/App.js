@@ -1,11 +1,10 @@
-// src/App.js
+// App.js
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Snackbar, Alert } from '@mui/material';
+import { Container, Typography, Snackbar, Alert, Box } from '@mui/material';
 import AddDeviceForm from './AddDeviceForm';
 import DeviceTable from './DeviceTable';
 import DeviceActions from './DeviceActions';
 import EditDeviceModal from './EditDeviceModal';
-import GenerateScriptButton from './GenerateScriptButton';
 
 const App = () => {
   const [devices, setDevices] = useState([]);
@@ -16,7 +15,7 @@ const App = () => {
 
   useEffect(() => {
     fetchDevices();
-    const interval = setInterval(fetchDevices, 5000);
+    const interval = setInterval(fetchDevices, 5000); // Polling elke 5 seconden
     return () => clearInterval(interval);
   }, []);
 
@@ -30,7 +29,7 @@ const App = () => {
           setNotification({ open: true, message: data.error || 'Error fetching devices.', severity: 'error' });
         }
       })
-      .catch(() => {
+      .catch(err => {
         setNotification({ open: true, message: 'Error fetching devices.', severity: 'error' });
       });
   };
@@ -50,12 +49,13 @@ const App = () => {
           setNotification({ open: true, message: 'Device added!', severity: 'success' });
         }
       })
-      .catch(() => {
+      .catch(err => {
         setNotification({ open: true, message: 'Error adding device.', severity: 'error' });
       });
   };
 
   const handleEdit = (device) => {
+    console.log('handleEdit called with device:', device); // Debugging lijn
     setDeviceToEdit(device);
     setIsEditModalOpen(true);
   };
@@ -81,7 +81,7 @@ const App = () => {
           setDeviceToEdit(null);
         }
       })
-      .catch(() => {
+      .catch(err => {
         setNotification({ open: true, message: 'Error updating device.', severity: 'error' });
       });
   };
@@ -101,7 +101,7 @@ const App = () => {
           if (selectedDeviceId === id) setSelectedDeviceId(null);
         }
       })
-      .catch(() => {
+      .catch(err => {
         setNotification({ open: true, message: 'Error deleting device.', severity: 'error' });
       });
   };
@@ -116,7 +116,7 @@ const App = () => {
           setNotification({ open: true, message: data.message, severity: 'success' });
         }
       })
-      .catch(() => {
+      .catch(err => {
         setNotification({ open: true, message: 'Error testing WOL.', severity: 'error' });
       });
   };
@@ -124,59 +124,54 @@ const App = () => {
   const selectedDevice = devices.find(device => device.id === selectedDeviceId);
 
   return (
-    <Container 
-      sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        minHeight: '100vh',
-        padding: { xs: '1rem', sm: '2rem' }
-      }}
-    >
-      <Typography 
-        variant="h4" 
-        gutterBottom 
-        sx={{ 
-          fontFamily: 'Roboto Slab, serif', 
-          fontSize: { xs: '2rem', sm: '3rem' }, 
-          textAlign: 'center',
-          marginBottom: { xs: '1rem', sm: '2rem' }
-        }}
+    <Container>
+      <Box 
+        display="flex" 
+        flexDirection="column" 
+        justifyContent="center" 
+        minHeight="100vh"
       >
-        ProxyWake
-      </Typography>
-      <AddDeviceForm onAddDevice={handleAddDevice} setNotification={setNotification} />
-      <DeviceTable 
-        devices={devices} 
-        selectedDeviceId={selectedDeviceId}
-        setSelectedDeviceId={setSelectedDeviceId}
-      />
-      <DeviceActions 
-        selectedDevice={selectedDevice} 
-        handleEdit={handleEdit} 
-        handleDelete={handleDelete} 
-        handleTestWOL={handleTestWOL} 
-      />
-      <GenerateScriptButton 
-        selectedDevice={selectedDevice} 
-        setNotification={setNotification} 
-      />
-      <EditDeviceModal 
-        open={isEditModalOpen} 
-        handleClose={() => { setIsEditModalOpen(false); setDeviceToEdit(null); }} 
-        device={deviceToEdit} 
-        onUpdate={handleUpdateDevice} 
-      />
-      <Snackbar 
-        open={notification.open} 
-        autoHideDuration={6000} 
-        onClose={() => setNotification({ ...notification, open: false })}
-      >
-        <Alert onClose={() => setNotification({ ...notification, open: false })} severity={notification.severity} sx={{ width: '100%' }}>
-          {notification.message}
-        </Alert>
-      </Snackbar>
+        <Typography 
+          variant="h4" 
+          gutterBottom 
+          sx={{ 
+            fontSize: { xs: '1.5rem', sm: '2rem' },
+            fontFamily: 'Montserrat, sans-serif',
+            textAlign: 'center',
+            marginTop: '1rem',
+            marginBottom: '1rem'
+          }}
+        >
+          ProxyWake
+        </Typography>
+        <AddDeviceForm onAddDevice={handleAddDevice} setNotification={setNotification} />
+        <DeviceTable 
+          devices={devices} 
+          selectedDeviceId={selectedDeviceId}
+          setSelectedDeviceId={setSelectedDeviceId}
+        />
+        <DeviceActions 
+          selectedDevice={selectedDevice} 
+          handleEdit={handleEdit} 
+          handleDelete={handleDelete} 
+          handleTestWOL={handleTestWOL} 
+        />
+        <EditDeviceModal 
+          open={isEditModalOpen} 
+          handleClose={() => { setIsEditModalOpen(false); setDeviceToEdit(null); }} 
+          device={deviceToEdit} 
+          onUpdate={handleUpdateDevice} 
+        />
+        <Snackbar 
+          open={notification.open} 
+          autoHideDuration={6000} 
+          onClose={() => setNotification({ ...notification, open: false })}
+        >
+          <Alert onClose={() => setNotification({ ...notification, open: false })} severity={notification.severity} sx={{ width: '100%' }}>
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      </Box>
     </Container>
   );
 };
