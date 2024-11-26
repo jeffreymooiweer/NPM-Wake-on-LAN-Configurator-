@@ -1,4 +1,4 @@
-// EditDeviceModal.js
+// src/EditDeviceModal.js
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, TextField, Button, Typography } from '@mui/material';
 
@@ -42,32 +42,35 @@ const EditDeviceModal = ({ open, handleClose, device, onUpdate }) => {
     >
       <Box component="form" onSubmit={handleSubmit} sx={style}>
         <Typography id="edit-device-title" variant="h6" component="h2" gutterBottom>
-          Edit Apparaat
+          Edit Device
         </Typography>
         <TextField
-          label="Domeinnaam"
+          label="Domain Name"
           variant="outlined"
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
           fullWidth
+          placeholder="e.g., device.local"
           margin="normal"
           sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
         />
         <TextField
-          label="Intern IP"
+          label="Internal IP"
           variant="outlined"
           value={ip}
           onChange={(e) => setIp(e.target.value)}
           fullWidth
+          placeholder="e.g., 192.168.1.100"
           margin="normal"
           sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
         />
         <TextField
-          label="MAC-adres"
+          label="MAC Address"
           variant="outlined"
           value={mac}
           onChange={(e) => setMac(e.target.value)}
           fullWidth
+          placeholder="e.g., AA:BB:CC:DD:EE:FF"
           margin="normal"
           sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
         />
