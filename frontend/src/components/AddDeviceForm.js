@@ -1,4 +1,3 @@
-// AddDeviceForm.js
 import React, { useState } from 'react';
 import { TextField, Button, Box } from '@mui/material';
 
@@ -10,7 +9,7 @@ const AddDeviceForm = ({ onAddDevice, setNotification }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!domain || !ip || !mac) {
-      setNotification({ open: true, message: 'All fields are required.', severity: 'error' });
+      setNotification({ open: true, message: 'Alle velden zijn vereist.', severity: 'error' });
       return;
     }
     onAddDevice({ domain, ip, mac });
@@ -26,30 +25,27 @@ const AddDeviceForm = ({ onAddDevice, setNotification }) => {
       sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, marginBottom: 2 }}
     >
       <TextField
-        label="Domain Name"
+        label="Domeinnaam"
         variant="outlined"
         value={domain}
         onChange={(e) => setDomain(e.target.value)}
         fullWidth
-        placeholder="e.g., proxywake.local"
         sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
       />
       <TextField
-        label="Internal IP"
+        label="Intern IP"
         variant="outlined"
         value={ip}
         onChange={(e) => setIp(e.target.value)}
         fullWidth
-        placeholder="e.g., 192.168.1.6"
         sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
       />
       <TextField
-        label="MAC Address"
+        label="MAC-adres"
         variant="outlined"
         value={mac}
         onChange={(e) => setMac(e.target.value)}
         fullWidth
-        placeholder="e.g., AA:BB:CC:DD:EE:FF"
         sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
       />
       <Button 
