@@ -1,4 +1,4 @@
-// src/EditDeviceModal.js
+// EditDeviceModal.js
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, TextField, Button, Typography } from '@mui/material';
 
@@ -12,6 +12,7 @@ const style = {
   border: '2px solid #000',
   boxShadow: 24,
   p: 4,
+  zIndex: 1300, // Zorgt ervoor dat de modal boven andere elementen ligt
 };
 
 const EditDeviceModal = ({ open, handleClose, device, onUpdate }) => {
@@ -21,11 +22,14 @@ const EditDeviceModal = ({ open, handleClose, device, onUpdate }) => {
 
   useEffect(() => {
     if (device) {
+      console.log('EditDeviceModal: setting device details:', device); // Debugging lijn
       setDomain(device.domain);
       setIp(device.ip);
       setMac(device.mac);
     }
   }, [device]);
+
+  console.log('EditDeviceModal: open =', open, 'deviceToEdit =', device); // Debugging lijn
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,8 +54,8 @@ const EditDeviceModal = ({ open, handleClose, device, onUpdate }) => {
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
           fullWidth
-          placeholder="e.g., device.local"
           margin="normal"
+          placeholder="e.g., proxywake.local"
           sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
         />
         <TextField
@@ -60,8 +64,8 @@ const EditDeviceModal = ({ open, handleClose, device, onUpdate }) => {
           value={ip}
           onChange={(e) => setIp(e.target.value)}
           fullWidth
-          placeholder="e.g., 192.168.1.100"
           margin="normal"
+          placeholder="e.g., 192.168.1.6"
           sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
         />
         <TextField
@@ -70,8 +74,8 @@ const EditDeviceModal = ({ open, handleClose, device, onUpdate }) => {
           value={mac}
           onChange={(e) => setMac(e.target.value)}
           fullWidth
-          placeholder="e.g., AA:BB:CC:DD:EE:FF"
           margin="normal"
+          placeholder="e.g., AA:BB:CC:DD:EE:FF"
           sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
         />
         <Box display="flex" justifyContent="flex-end" gap={2} marginTop={2}>
