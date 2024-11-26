@@ -1,13 +1,11 @@
-// src/theme.js
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
   typography: {
     h4: {
-      fontFamily: 'Roboto Slab, serif',
-      fontSize: '2rem',
+      fontSize: '1.5rem',
       '@media (min-width:600px)': {
-        fontSize: '3rem',
+        fontSize: '2rem',
       },
     },
     body1: {
