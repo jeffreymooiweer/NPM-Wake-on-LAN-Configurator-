@@ -1,4 +1,4 @@
-// src/DeviceTable.js
+// DeviceTable.js
 import React from 'react';
 import { 
   Table, 
@@ -12,7 +12,7 @@ import {
 
 const DeviceTable = ({ devices, selectedDeviceId, setSelectedDeviceId }) => {
   return (
-    <Paper elevation={3} sx={{ padding: '1rem', overflowX: 'auto', width: '100%', maxWidth: '800px' }}>
+    <Paper elevation={3} sx={{ padding: '1rem', overflowX: 'auto' }}>
       <Table>
         <TableHead>
           <TableRow>
