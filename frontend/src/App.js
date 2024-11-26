@@ -1,10 +1,11 @@
-// App.js
+// src/App.js
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Snackbar, Alert, Button } from '@mui/material';
+import { Container, Typography, Snackbar, Alert } from '@mui/material';
 import AddDeviceForm from './AddDeviceForm';
 import DeviceTable from './DeviceTable';
 import DeviceActions from './DeviceActions';
-import EditDeviceModal from './EditDeviceModal'; // Zorg voor correcte import
+import EditDeviceModal from './EditDeviceModal';
+import GenerateScriptButton from './GenerateScriptButton';
 
 const App = () => {
   const [devices, setDevices] = useState([]);
@@ -15,7 +16,7 @@ const App = () => {
 
   useEffect(() => {
     fetchDevices();
-    const interval = setInterval(fetchDevices, 5000); // Polling elke 5 seconden
+    const interval = setInterval(fetchDevices, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -26,11 +27,11 @@ const App = () => {
         if (Array.isArray(data)) {
           setDevices(data);
         } else {
-          setNotification({ open: true, message: data.error || 'Fout bij het ophalen van apparaten.', severity: 'error' });
+          setNotification({ open: true, message: data.error || 'Error fetching devices.', severity: 'error' });
         }
       })
-      .catch(err => {
-        setNotification({ open: true, message: 'Fout bij het ophalen van apparaten.', severity: 'error' });
+      .catch(() => {
+        setNotification({ open: true, message: 'Error fetching devices.', severity: 'error' });
       });
   };
 
@@ -46,16 +47,15 @@ const App = () => {
           setNotification({ open: true, message: data.error, severity: 'error' });
         } else {
           setDevices([...devices, data]);
-          setNotification({ open: true, message: 'Apparaat toegevoegd!', severity: 'success' });
+          setNotification({ open: true, message: 'Device added!', severity: 'success' });
         }
       })
-      .catch(err => {
-        setNotification({ open: true, message: 'Fout bij het toevoegen van apparaat.', severity: 'error' });
+      .catch(() => {
+        setNotification({ open: true, message: 'Error adding device.', severity: 'error' });
       });
   };
 
   const handleEdit = (device) => {
-    console.log('handleEdit called with device:', device); // Debugging lijn
     setDeviceToEdit(device);
     setIsEditModalOpen(true);
   };
@@ -76,18 +76,18 @@ const App = () => {
           setNotification({ open: true, message: data.error, severity: 'error' });
         } else {
           setDevices(devices.map(device => device.id === data.id ? data : device));
-          setNotification({ open: true, message: 'Apparaat bijgewerkt!', severity: 'success' });
+          setNotification({ open: true, message: 'Device updated!', severity: 'success' });
           setIsEditModalOpen(false);
           setDeviceToEdit(null);
         }
       })
-      .catch(err => {
-        setNotification({ open: true, message: 'Fout bij het bijwerken van apparaat.', severity: 'error' });
+      .catch(() => {
+        setNotification({ open: true, message: 'Error updating device.', severity: 'error' });
       });
   };
 
   const handleDelete = (id) => {
-    if (!window.confirm('Weet je zeker dat je dit apparaat wilt verwijderen?')) return;
+    if (!window.confirm('Are you sure you want to delete this device?')) return;
     fetch(`/api/devices/${id}`, {
       method: 'DELETE',
     })
@@ -97,12 +97,12 @@ const App = () => {
           setNotification({ open: true, message: data.error, severity: 'error' });
         } else {
           setDevices(devices.filter(device => device.id !== id));
-          setNotification({ open: true, message: 'Apparaat verwijderd!', severity: 'success' });
+          setNotification({ open: true, message: 'Device deleted!', severity: 'success' });
           if (selectedDeviceId === id) setSelectedDeviceId(null);
         }
       })
-      .catch(err => {
-        setNotification({ open: true, message: 'Fout bij het verwijderen van apparaat.', severity: 'error' });
+      .catch(() => {
+        setNotification({ open: true, message: 'Error deleting device.', severity: 'error' });
       });
   };
 
@@ -116,17 +116,35 @@ const App = () => {
           setNotification({ open: true, message: data.message, severity: 'success' });
         }
       })
-      .catch(err => {
-        setNotification({ open: true, message: 'Fout bij testen WOL.', severity: 'error' });
+      .catch(() => {
+        setNotification({ open: true, message: 'Error testing WOL.', severity: 'error' });
       });
   };
 
   const selectedDevice = devices.find(device => device.id === selectedDeviceId);
 
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
-        NPM Wake-on-LAN Configurator
+    <Container 
+      sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        minHeight: '100vh',
+        padding: { xs: '1rem', sm: '2rem' }
+      }}
+    >
+      <Typography 
+        variant="h4" 
+        gutterBottom 
+        sx={{ 
+          fontFamily: 'Roboto Slab, serif', 
+          fontSize: { xs: '2rem', sm: '3rem' }, 
+          textAlign: 'center',
+          marginBottom: { xs: '1rem', sm: '2rem' }
+        }}
+      >
+        ProxyWake
       </Typography>
       <AddDeviceForm onAddDevice={handleAddDevice} setNotification={setNotification} />
       <DeviceTable 
@@ -139,6 +157,10 @@ const App = () => {
         handleEdit={handleEdit} 
         handleDelete={handleDelete} 
         handleTestWOL={handleTestWOL} 
+      />
+      <GenerateScriptButton 
+        selectedDevice={selectedDevice} 
+        setNotification={setNotification} 
       />
       <EditDeviceModal 
         open={isEditModalOpen} 
