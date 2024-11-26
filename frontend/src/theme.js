@@ -1,13 +1,13 @@
-// theme.js
+// src/theme.js
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
   typography: {
-    // Responsive font sizes
     h4: {
-      fontSize: '1.5rem',
+      fontFamily: 'Roboto Slab, serif',
+      fontSize: '2rem',
       '@media (min-width:600px)': {
-        fontSize: '2rem',
+        fontSize: '3rem',
       },
     },
     body1: {
