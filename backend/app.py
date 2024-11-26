@@ -172,7 +172,7 @@ def bad_request(error):
 def internal_error(error):
     return jsonify({'error': 'Interne serverfout.'}), 500
 
-# Initialize the database within app context
+# Initialize the database binnen app context
 with app.app_context():
     db.create_all()
 
