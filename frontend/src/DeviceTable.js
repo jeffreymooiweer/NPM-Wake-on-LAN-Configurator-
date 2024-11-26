@@ -1,3 +1,4 @@
+// src/DeviceTable.js
 import React from 'react';
 import { 
   Table, 
@@ -11,14 +12,14 @@ import {
 
 const DeviceTable = ({ devices, selectedDeviceId, setSelectedDeviceId }) => {
   return (
-    <Paper elevation={3} sx={{ padding: '1rem', overflowX: 'auto' }}>
+    <Paper elevation={3} sx={{ padding: '1rem', overflowX: 'auto', width: '100%', maxWidth: '800px' }}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Select</TableCell>
-            <TableCell>Domeinnaam</TableCell>
-            <TableCell>Intern IP</TableCell>
-            <TableCell>MAC-adres</TableCell>
+            <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>Select</TableCell>
+            <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>Domain Name</TableCell>
+            <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>Internal IP</TableCell>
+            <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>MAC Address</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -30,16 +31,17 @@ const DeviceTable = ({ devices, selectedDeviceId, setSelectedDeviceId }) => {
                   onChange={() => setSelectedDeviceId(device.id)}
                   value={device.id}
                   name="selectedDevice"
+                  size="small"
                 />
               </TableCell>
-              <TableCell>{device.domain}</TableCell>
-              <TableCell>{device.ip}</TableCell>
-              <TableCell>{device.mac}</TableCell>
+              <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>{device.domain}</TableCell>
+              <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>{device.ip}</TableCell>
+              <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>{device.mac}</TableCell>
             </TableRow>
           )) : (
             <TableRow>
               <TableCell colSpan={4} align="center">
-                Geen apparaten toegevoegd of er is een fout opgetreden.
+                No devices added or an error occurred.
               </TableCell>
             </TableRow>
           )}
