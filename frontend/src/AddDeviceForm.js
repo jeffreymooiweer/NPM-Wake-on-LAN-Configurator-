@@ -1,4 +1,4 @@
-// src/AddDeviceForm.js
+// AddDeviceForm.js
 import React, { useState } from 'react';
 import { TextField, Button, Box } from '@mui/material';
 
@@ -23,7 +23,7 @@ const AddDeviceForm = ({ onAddDevice, setNotification }) => {
     <Box 
       component="form" 
       onSubmit={handleSubmit} 
-      sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, marginBottom: 2, width: '100%', maxWidth: '800px' }}
+      sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, marginBottom: 2 }}
     >
       <TextField
         label="Domain Name"
@@ -31,7 +31,7 @@ const AddDeviceForm = ({ onAddDevice, setNotification }) => {
         value={domain}
         onChange={(e) => setDomain(e.target.value)}
         fullWidth
-        placeholder="e.g., device.local"
+        placeholder="e.g., proxywake.local"
         sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
       />
       <TextField
@@ -40,7 +40,7 @@ const AddDeviceForm = ({ onAddDevice, setNotification }) => {
         value={ip}
         onChange={(e) => setIp(e.target.value)}
         fullWidth
-        placeholder="e.g., 192.168.1.100"
+        placeholder="e.g., 192.168.1.6"
         sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
       />
       <TextField
