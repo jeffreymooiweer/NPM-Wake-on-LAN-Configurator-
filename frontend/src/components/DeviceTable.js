@@ -1,4 +1,3 @@
-// DeviceTable.js
 import React from 'react';
 import { 
   Table, 
@@ -17,9 +16,9 @@ const DeviceTable = ({ devices, selectedDeviceId, setSelectedDeviceId }) => {
         <TableHead>
           <TableRow>
             <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>Select</TableCell>
-            <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>Domain Name</TableCell>
-            <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>Internal IP</TableCell>
-            <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>MAC Address</TableCell>
+            <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>Domeinnaam</TableCell>
+            <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>Intern IP</TableCell>
+            <TableCell sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}>MAC-adres</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -41,7 +40,7 @@ const DeviceTable = ({ devices, selectedDeviceId, setSelectedDeviceId }) => {
           )) : (
             <TableRow>
               <TableCell colSpan={4} align="center">
-                No devices added or an error occurred.
+                Geen apparaten toegevoegd of er is een fout opgetreden.
               </TableCell>
             </TableRow>
           )}
