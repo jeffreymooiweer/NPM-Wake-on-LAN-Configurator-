@@ -1,50 +1,12 @@
-// src/DeviceActions.js
-import React from 'react';
-import { Button, Box } from '@mui/material';
+// DeviceActions.js
+import React, { useState } from 'react';
+import { Button, Box, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 const DeviceActions = ({ selectedDevice, handleEdit, handleDelete, handleTestWOL }) => {
-  return (
-    <Box 
-      display="flex" 
-      flexDirection={{ xs: 'column', sm: 'row' }} 
-      justifyContent="center" 
-      gap={2} 
-      marginTop={2}
-      width="100%"
-      maxWidth="800px"
-    >
-      <Button 
-        variant="outlined" 
-        color="primary" 
-        onClick={() => handleEdit(selectedDevice)}
-        disabled={!selectedDevice}
-        fullWidth={{ xs: true, sm: false }}
-        sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
-      >
-        Edit
-      </Button>
-      <Button 
-        variant="outlined" 
-        color="secondary" 
-        onClick={() => handleDelete(selectedDevice?.id)}
-        disabled={!selectedDevice}
-        fullWidth={{ xs: true, sm: false }}
-        sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
-      >
-        Delete
-      </Button>
-      <Button 
-        variant="contained" 
-        color="success" 
-        onClick={() => handleTestWOL(selectedDevice)}
-        disabled={!selectedDevice}
-        fullWidth={{ xs: true, sm: false }}
-        sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
-      >
-        Test WOL
-      </Button>
-    </Box>
-  );
-};
+  const [script, setScript] = useState('');
+  const [isScriptDialogOpen, setIsScriptDialogOpen] = useState(false);
 
-export default DeviceActions;
+  const generateScript = () => {
+    if (!selectedDevice) return;
+    const scriptContent = `
