@@ -1,4 +1,3 @@
-// EditDeviceModal.js
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, TextField, Button, Typography } from '@mui/material';
 
@@ -12,7 +11,7 @@ const style = {
   border: '2px solid #000',
   boxShadow: 24,
   p: 4,
-  zIndex: 1300, // Zorgt ervoor dat de modal boven andere elementen ligt
+  zIndex: 1300,
 };
 
 const EditDeviceModal = ({ open, handleClose, device, onUpdate }) => {
@@ -22,14 +21,11 @@ const EditDeviceModal = ({ open, handleClose, device, onUpdate }) => {
 
   useEffect(() => {
     if (device) {
-      console.log('EditDeviceModal: setting device details:', device); // Debugging lijn
       setDomain(device.domain);
       setIp(device.ip);
       setMac(device.mac);
     }
   }, [device]);
-
-  console.log('EditDeviceModal: open =', open, 'deviceToEdit =', device); // Debugging lijn
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -46,36 +42,33 @@ const EditDeviceModal = ({ open, handleClose, device, onUpdate }) => {
     >
       <Box component="form" onSubmit={handleSubmit} sx={style}>
         <Typography id="edit-device-title" variant="h6" component="h2" gutterBottom>
-          Edit Device
+          Edit Apparaat
         </Typography>
         <TextField
-          label="Domain Name"
+          label="Domeinnaam"
           variant="outlined"
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
           fullWidth
           margin="normal"
-          placeholder="e.g., proxywake.local"
           sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
         />
         <TextField
-          label="Internal IP"
+          label="Intern IP"
           variant="outlined"
           value={ip}
           onChange={(e) => setIp(e.target.value)}
           fullWidth
           margin="normal"
-          placeholder="e.g., 192.168.1.6"
           sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
         />
         <TextField
-          label="MAC Address"
+          label="MAC-adres"
           variant="outlined"
           value={mac}
           onChange={(e) => setMac(e.target.value)}
           fullWidth
           margin="normal"
-          placeholder="e.g., AA:BB:CC:DD:EE:FF"
           sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }}
         />
         <Box display="flex" justifyContent="flex-end" gap={2} marginTop={2}>
