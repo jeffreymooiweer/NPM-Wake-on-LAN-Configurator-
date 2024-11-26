@@ -1,25 +1,45 @@
-# Dockerfile
-
-# Build stage for frontend
+# Stage 1: Build React frontend
 FROM node:16 as frontend-build
-WORKDIR /app
-COPY frontend/package.json frontend/package-lock.json ./frontend/
-RUN cd frontend && npm install
-COPY frontend ./frontend
-RUN cd frontend && npm run build
 
-# Build stage for backend
-FROM python:3.9-slim
-WORKDIR /app
-COPY backend/requirements.txt ./backend/
-RUN pip install --no-cache-dir -r backend/requirements.txt
-COPY backend ./backend
+WORKDIR /app/frontend
 
-# Kopieer frontend build naar backend
-COPY --from=frontend-build /app/frontend/build ./backend/frontend/build
+# Kopieer package.json
+COPY frontend/package.json ./
 
-# Expose port
+# Installeer frontend dependencies
+RUN npm install
+
+# Kopieer frontend broncode
+COPY frontend/ ./
+
+# Bouw de frontend
+RUN npm run build
+
+# Stage 2: Setup Flask backend
+FROM python:3.9-slim as backend
+
+WORKDIR /app/backend
+
+# Installeer systeemafhankelijkheden
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Kopieer backend requirements en installeer
+COPY backend/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Kopieer backend broncode
+COPY backend/ ./
+
+# Kopieer frontend build naar backend directory
+COPY --from=frontend-build /app/frontend/build ./frontend/build
+
+# Expose poort
 EXPOSE 5001
 
-# Start the application
-CMD ["python", "backend/app.py"]
+# Installeren van gunicorn
+RUN pip install gunicorn
+
+# Start de applicatie met gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:5001", "app:app"]
