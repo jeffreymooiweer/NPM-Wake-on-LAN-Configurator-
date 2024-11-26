@@ -1,16 +1,12 @@
-/* src/index.css */
+/* index.css */
+
+/* Zorg ervoor dat de body geen scrollbars heeft tenzij nodig */
 body, html, #root {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
   overflow-x: hidden;
-}
-
-#root {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 /* Responsieve tabel */
