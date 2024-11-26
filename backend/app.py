@@ -1,11 +1,11 @@
-// backend/app.py
+# backend/app.py
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///devices.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///backend/devices.db'
 db = SQLAlchemy(app)
 
 class Device(db.Model):
